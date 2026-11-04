@@ -13,11 +13,36 @@
 - 錢包已領 Agent ID（幣安 App 裡的 `.ai` 網域）；內盤交易需開啟開發者模式
 - Discord webhook 可選（個人通知）
 
+## 安裝（本機／VPS 必做）
+
+`node_modules` **不會**進 GitHub（`.gitignore`）。clone 或 pull 之後若直接 `npm start`，會出現找不到 `smol-toml`（`src/config.mjs` 有 import 它）。
+
+在專案根目錄先裝依賴：
+
+```bash
+git clone https://github.com/0xoshinoaj/baw_monitor.git
+cd baw_monitor
+npm ci          # 建議；與 package-lock 一致
+# 或：npm install
+```
+
+VPS 建議流程：
+
+```bash
+git pull
+npm ci
+cp -n config.example.toml config.toml   # 已有設定就跳過
+# 編輯 config.toml（Discord webhook 等）
+npm start
+```
+
+`npm start` / `npm run login` / `npm test` 前會跑 `ensure`：若還沒裝依賴，會印上述說明並退出，而不是丟一長串 module not found。
+
 ## 設定
 
-設定檔是 `config.toml`（可寫註解）。範例在 `config.example.toml`。
+設定檔是 `config.toml`（可寫註解）。範例在 `config.example.toml`。本機機密設定不要 commit。
 
-**不必事先 `cp`，也不必手填錢包名稱或地址。** 直接：
+**不必事先 `cp`，也不必手填錢包名稱或地址。** 裝好依賴後：
 
 ```bash
 npm start
@@ -83,6 +108,7 @@ webhook = "https://discord.com/api/webhooks/123/token"  # 個人通知
 ## 啟動
 
 ```bash
+npm ci    # 首次或依賴有變時
 npm start
 ```
 
