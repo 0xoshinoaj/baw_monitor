@@ -1,0 +1,138 @@
+# baw-monitor 設定範例
+# 不必手填錢包。直接 npm start：沒有 config.toml 會複製本檔，登入 baw 後自動帶入
+# 錢包名稱（Agent ID / .ai）與 BSC 地址。Discord webhook 可略過，之後在選單再補。
+# 本檔用 TOML，可以寫註解。不要把私鑰寫進來。
+
+# 顯示與日切換用的時區
+timeZone = "Asia/Taipei"
+
+# ---------------------------------------------------------------------------
+# 錢包：至少一個。name 是幣安 Agent ID（.ai 網域，登入後自動帶入），address 是 BSC 地址（不必手填）。
+# 多錢包再加一段 [[wallets]]。可選 bawDir / bawPkg / instanceId。
+# ---------------------------------------------------------------------------
+[[wallets]]
+name = "mywallet.ai"
+address = "0xYourAgentWallet"
+# bawDir = ""
+# bawPkg = ""
+# instanceId = ""
+
+# ---------------------------------------------------------------------------
+# Discord：可略過。沒設 Discord 也沒設 Telegram 就只寫 log。啟動後可在選單補。
+# webhook 每個訊息最多 2000 字，程式會自動切割。
+# webhook = log 頻道：啟動、發現候選、阻擋、登入／開發者模式／BNB、指令測試等營運 log。
+# pass_webhook = 通過／鑄造頻道：達門檻、只通知不打、等待確認、preview、已鑄造、鑄造失敗；
+#   開池／倍數／賣出也走這條。沒填則通過／鑄造仍打上面那顆 webhook，避免漏通知。
+# ---------------------------------------------------------------------------
+[discord]
+webhook = ""  # log 頻道（個人通知／營運 log）
+pass_webhook = ""  # 通過／鑄造頻道；可空，空則仍打 webhook
+# alert_webhook = ""  # 可選：硬擋、登入失效、確認請求等另發一個
+
+# ---------------------------------------------------------------------------
+# Telegram：選用。留空則不走 TG。confirm 模式的「打 0x」仍靠 TG 指令。
+# ---------------------------------------------------------------------------
+[telegram]
+botToken = ""
+chatId = ""
+groupChatId = ""
+
+# ---------------------------------------------------------------------------
+# 發現來源：官方 Open Four / meme-rush 為主，其餘為補助。
+# ---------------------------------------------------------------------------
+[discovery.memeRush]
+enabled = true
+intervalMs = 15000
+cli = ""
+rankTypes = [10, 20]
+limit = 50
+
+[discovery.newContracts]
+enabled = true
+# BSC ~0.45s/塊、每分鐘 ~130 塊。每輪最多掃 lookbackBlocks；落後未超過 lagJumpBlocks（預設 1600，約 12 分鐘）就接著追，只有極端落後才跳到最新並警告。
+lookbackBlocks = 64
+intervalMs = 3000
+lagJumpBlocks = 1600
+
+[discovery.heat]
+enabled = true
+windowMs = 180000
+minWallets = 8
+intervalMs = 20000
+lookbackBlocks = 32
+lagJumpBlocks = 1600
+
+[discovery.mintEvents]
+enabled = true
+# 跨輪記憶體累加不同收款地址，視窗 15 分鐘（不是單次 getLogs 區間）。熱度窗請看 [discovery.heat]。
+windowMs = 900000
+minMints = 8
+# 每輪最多約 60 塊。intervalMs=0：每輪 discover 嘗試啟動；上一輪還在跑就整段跳過，不卡住主掃描。
+# getLogs 專用節點失敗不改抓收據、游標不推進；冷卻 failCooldownMs（預設 30s）再試。
+lookbackBlocks = 60
+intervalMs = 0
+lagJumpBlocks = 1600
+
+# ---------------------------------------------------------------------------
+# 執行模式：免費與付費分開。notify＝只通知／confirm＝等確認／auto＝自動打
+# ---------------------------------------------------------------------------
+[execution]
+free = "notify"
+paid = "auto"
+
+# ---------------------------------------------------------------------------
+# 達標門檻：進度％、Agent ID 錢包數、是否要求每錢包上限
+# ---------------------------------------------------------------------------
+[thresholds]
+progressPct = 60
+agentIdWallets = 100
+requirePerWalletCap = true
+serialDeployMax = 3
+serialDevMax = 10
+freshWalletNonce = 50
+
+# ---------------------------------------------------------------------------
+# 預算：每項目／每日美元上限，以及錢包至少保留的 BNB（gas）
+# ---------------------------------------------------------------------------
+[budget]
+maxUsdPerProject = 20
+maxUsdPerDay = 200
+keepBnb = 0.006
+
+# ---------------------------------------------------------------------------
+# 賣出：付費回本／分批／回落；免費到倍數只通知，回落才賣
+# ---------------------------------------------------------------------------
+[sell]
+backX = 2
+steps = [[10, 30], [20, 50]]
+crash = 0.4
+crashAfterBack = 0.6
+moonPct = 20
+moonNotifyX = [50, 100]
+notifyX = [5, 10, 20]
+freeDrop = 0.5
+fastMin = 30
+
+# ---------------------------------------------------------------------------
+# 官方 CLI／內盤參數（可選）
+# ---------------------------------------------------------------------------
+[official]
+agentIdScript = ""
+memeRushCli = ""
+slippageBps = 2000
+buyAmountBnb = "0.05"
+
+# 強制列入的合約（仍走 preview 安全檢查）
+forceMint = []
+
+# 手動持倉。需要時改成 [[tokens]] 表格：
+# [[tokens]]
+# addr = "0x..."
+# cost = 0
+# hold = false
+# both = true
+# sellNow = false
+tokens = []
+
+# 自備 BSC RPC；空白則用程式內建的公共節點
+rpcs = []

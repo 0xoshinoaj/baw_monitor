@@ -1,0 +1,31 @@
+# secrets / local config (use config.example.toml on VPS)
+config.toml
+config.json
+.env
+.env.*
+!.env.example
+
+# runtime data & locks
+data/
+*.lock
+WATCH_STOP
+
+# logs
+*.log
+logs/
+
+# dependencies
+node_modules/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*~
+
+# coverage / caches
+.cache/
+coverage/
+.nyc_output/

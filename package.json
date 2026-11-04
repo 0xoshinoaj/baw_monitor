@@ -1,0 +1,19 @@
+{
+  "name": "baw-monitor",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "本機 Agent ID 專屬項目監控／自動鑄造（官方 baw preview → execute，不碰私鑰）",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node src/index.mjs",
+    "login": "node login.mjs",
+    "test": "node --test test/*.test.mjs",
+    "check": "find . -name '*.mjs' ! -path './node_modules/*' ! -path './.git/*' -print0 | xargs -0 -n1 node --check"
+  },
+  "dependencies": {
+    "smol-toml": "^1.9.1"
+  }
+}
